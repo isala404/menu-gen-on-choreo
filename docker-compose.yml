@@ -1,9 +1,19 @@
 version: '3.8'
 services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: menugen
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
   backend:
     build: ./backend
     ports:
       - "8080:8080"
+    depends_on:
+      - db
   frontend:
     build: ./frontend
     ports:
@@ -11,3 +21,5 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+volumes:
+  postgres_data:

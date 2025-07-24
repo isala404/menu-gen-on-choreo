@@ -1,15 +1,48 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"net/http"
+	"log"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello from the backend!")
-	})
+var db *sql.DB
 
-	fmt.Println("Backend server is running on port 8080")
-	http.ListenAndServe(":8080", nil)
+func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, using environment variables")
+	}
+
+	connStr := os.Getenv("DATABASE_URL")
+	db, err = sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Successfully connected to the database")
+
+	createTables(db)
+
+	r := gin.Default()
+
+	api := r.Group("/api")
+	{
+		api.POST("/menus", createMenu)
+		api.POST("/menus/:id/process", processMenu)
+		api.GET("/menus/:id", getMenu)
+		api.POST("/menu-items/:id/regenerate", regenerateMenuItem)
+	}
+
+	r.Run(":8080")
 }
