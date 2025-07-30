@@ -82,12 +82,13 @@ type Config struct {
 
 func getConfig() Config {
 	config := Config{
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBPort:       getEnv("DB_PORT", "5432"),
-		DBUser:       getEnv("DB_USER", "postgres"),
-		DBPassword:   getEnv("DB_PASSWORD", ""),
-		DBName:       getEnv("DB_NAME", "menugen"),
-		OpenAIAPIKey: getEnv("OPENAI_API_KEY", ""),
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnv("DB_PORT", "5432"),
+		DBUser:     getEnv("DB_USER", "postgres"),
+		DBPassword: getEnv("DB_PASSWORD", ""),
+		DBName:     getEnv("DB_NAME", "menugen"),
+		// Try Choreo-provided OpenAI API key first, then fallback to OPENAI_API_KEY
+		OpenAIAPIKey: getEnv("CHOREO_OPENAI_CONNECTION_OPENAI_API_KEY", getEnv("OPENAI_API_KEY", "")),
 		Port:         getEnv("PORT", "8080"),
 	}
 
