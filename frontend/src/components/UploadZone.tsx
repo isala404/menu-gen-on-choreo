@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import type { DragEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const UploadZone: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -9,6 +10,7 @@ const UploadZone: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -70,8 +72,26 @@ const UploadZone: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-cream flex flex-col">
+      {/* Top Bar with Logout */}
+      <div className="flex justify-between items-center p-4">
+        <div></div> {/* Spacer */}
+        <div className="flex items-center gap-4">
+          {user?.email && (
+            <span className="text-gray-600 text-sm">Welcome, {user.email}</span>
+          )}
+          <button
+            onClick={logout}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-serif text-6xl font-bold text-primary mb-4">
@@ -202,6 +222,7 @@ const UploadZone: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
